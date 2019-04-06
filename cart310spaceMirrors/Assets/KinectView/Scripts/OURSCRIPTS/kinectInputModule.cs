@@ -234,11 +234,15 @@ public class KinectInputData
                 _hoveringObject = value;
                 if (_hoveringObject == null) return;
                 //if (_hoveringObject.GetComponent<KinectUIWaitOverButton>())
-                    ClickGesture = KinectUIClickGesture.WaitOver;
-                else
-                    ClickGesture = KinectUIClickGesture.HandState;
+                ClickGesture = KinectUIClickGesture.WaitOver;
+            }
+
+            else
+            {
+                ClickGesture = KinectUIClickGesture.HandState;
                 WaitOverAmount = 0f;
             }
+            
         }
     }
     public HandState CurrentHandState { get; private set; }
