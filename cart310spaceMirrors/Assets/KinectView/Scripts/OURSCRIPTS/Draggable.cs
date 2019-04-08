@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public GameObject pieceSpot;
-    bool locked = false;
+    public bool locked = false;
 
     public void OnBeginDrag(PointerEventData eventData)
     {
