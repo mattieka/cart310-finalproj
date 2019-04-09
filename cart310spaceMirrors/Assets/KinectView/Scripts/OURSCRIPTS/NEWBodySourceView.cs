@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 
 public class NEWBodySourceView : MonoBehaviour
 {
-
+    bool isHolding = false;
     public BodySourceManager mBodySourceManager;
     public GameObject mJointObject;
     private GameObject[] piece;
@@ -163,7 +163,7 @@ public class NEWBodySourceView : MonoBehaviour
 
             return body;
         }
-        private GameObject puzzlePiece;
+        private GameObject[] puzzlePieces;
         private void UpdateBodyObject(Body body, GameObject bodyObject)
         {
            
@@ -182,26 +182,76 @@ public class NEWBodySourceView : MonoBehaviour
             //check collisions
             if (body.IsTracked)
             {
-            puzzlePiece = GameObject.FindGameObjectWithTag("piece");
+            puzzlePieces = GameObject.FindGameObjectsWithTag("piece");
             Vector3 rightHandPosition = GetVector3FromJoint(body.Joints[JointType.HandRight]);
-            Vector3 leftHandPosition = GetVector3FromJoint(body.Joints[JointType.HandRight]);
-            float rightDist = Vector3.Distance(puzzlePiece.transform.position, rightHandPosition);
-            float leftDist = Vector3.Distance(puzzlePiece.transform.position, leftHandPosition);
+            rightHandPosition.z = 0;
 
-            if (body.HandRightState == HandState.Closed)
+            Vector3 leftHandPosition = GetVector3FromJoint(body.Joints[JointType.HandLeft]);
+            leftHandPosition.z = 0;
+
+            
+            
+
+            foreach (GameObject puzzlePiece in puzzlePieces)
+            {
+                GameObject pieceSpot = puzzlePiece.GetComponent<Draggable>().pieceSpot;
+                bool locked = puzzlePiece.GetComponent<Draggable>().locked;
+                float rightDist = Vector3.Distance(puzzlePiece.transform.position, rightHandPosition);
+                
+                float leftDist = Vector3.Distance(puzzlePiece.transform.position, leftHandPosition);
+
+                if (body.HandRightState == HandState.Closed)
+                {
+                    Debug.Log("RIGHT HAND IS CLOSED " +  rightDist + " " + puzzlePiece.name);
+                    if (rightDist < 1 && (locked == false))
                     {
-                        Debug.Log("RIGHT HAND IS CLOSED");
-                        if (rightDist < 20)
+                        Debug.Log("PIECE GRABBED WITH RIGHT HAND ");
+              
+                        puzzlePiece.transform.position = rightHandPosition;
+                        
+                        float pieceSpotDistance = Vector3.Distance(puzzlePiece.transform.position, pieceSpot.transform.position);
+                        if (pieceSpotDistance < 0.5)
                         {
-                             Debug.Log("PIECE GRABBED WITH RIGHT HAND");
-                             puzzlePiece.transform.position = rightHandPosition;
-                        }
-                    }
+                            puzzlePiece.transform.position = pieceSpot.transform.position;
+                            puzzlePiece.transform.position = new Vector3(pieceSpot.transform.position.x, pieceSpot.transform.position.y, -1);
 
-                    if (body.HandLeftState == HandState.Closed)
-                    {
-                        Debug.Log("LEFT HAND IS CLOSED");
+                            locked = true;
+                            
+                        }
+                        return;
+
+                        
                     }
+                }
+
+                if (body.HandLeftState == HandState.Closed)
+                {
+                    Debug.Log("LEFT HAND IS CLOSED " + leftDist + " " + puzzlePiece.name);
+                    if (leftDist < 1 && (locked == false))
+                    {
+                        Debug.Log("PIECE GRABBED WITH LEFT HAND ");
+                        puzzlePiece.transform.position = leftHandPosition;
+                        //puzzlePiece.GetComponent<Draggable>().followingHand = leftHandPosition;
+                        
+                        float pieceSpotDistance = Vector3.Distance(puzzlePiece.transform.position, pieceSpot.transform.position);
+                        if (pieceSpotDistance < 0.5)
+                        {
+                            puzzlePiece.transform.position = pieceSpot.transform.position;
+                            puzzlePiece.transform.position = new Vector3(pieceSpot.transform.position.x, pieceSpot.transform.position.y, -1);
+
+                            locked = true;
+
+                        }
+                        return;
+                    }
+                }
+
+                if (body.HandLeftState == HandState.Open && body.HandRightState == HandState.Open)
+                {
+                    
+                }
+            }
+            
                 
                
             }
