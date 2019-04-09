@@ -8,6 +8,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     public GameObject pieceSpot;
     public bool locked = false;
 
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (!locked) {

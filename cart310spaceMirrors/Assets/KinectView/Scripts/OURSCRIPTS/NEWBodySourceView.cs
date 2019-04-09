@@ -13,6 +13,7 @@ public class NEWBodySourceView : MonoBehaviour
 
     public BodySourceManager mBodySourceManager;
     public GameObject mJointObject;
+    private GameObject[] piece;
 
     //public Material BoneMaterial;
     //public GameObject BodySourceManager;
@@ -101,15 +102,7 @@ public class NEWBodySourceView : MonoBehaviour
             {
                 trackedIds.Add(body.TrackingId);
 
-                if (body.HandRightState == HandState.Closed)
-                {
-                    Debug.Log("RIGHT HAND IS CLOSED");
-                }
-
-                if (body.HandLeftState == HandState.Closed)
-                {
-                    Debug.Log("LEFT HAND IS CLOSED");
-                }
+                
             }
         }
         #endregion
@@ -170,9 +163,10 @@ public class NEWBodySourceView : MonoBehaviour
 
             return body;
         }
-
+        private GameObject puzzlePiece;
         private void UpdateBodyObject(Body body, GameObject bodyObject)
         {
+           
             // update joints
             foreach (JointType _joint in _joints)
             {
@@ -185,7 +179,33 @@ public class NEWBodySourceView : MonoBehaviour
                 Transform jointObject = bodyObject.transform.Find(_joint.ToString());
                 jointObject.position = targetPosition;
             }
-        }
+            //check collisions
+            if (body.IsTracked)
+            {
+            puzzlePiece = GameObject.FindGameObjectWithTag("piece");
+            Vector3 rightHandPosition = GetVector3FromJoint(body.Joints[JointType.HandRight]);
+            Vector3 leftHandPosition = GetVector3FromJoint(body.Joints[JointType.HandRight]);
+            float rightDist = Vector3.Distance(puzzlePiece.transform.position, rightHandPosition);
+            float leftDist = Vector3.Distance(puzzlePiece.transform.position, leftHandPosition);
+
+            if (body.HandRightState == HandState.Closed)
+                    {
+                        Debug.Log("RIGHT HAND IS CLOSED");
+                        if (rightDist < 20)
+                        {
+                             Debug.Log("PIECE GRABBED WITH RIGHT HAND");
+                             puzzlePiece.transform.position = rightHandPosition;
+                        }
+                    }
+
+                    if (body.HandLeftState == HandState.Closed)
+                    {
+                        Debug.Log("LEFT HAND IS CLOSED");
+                    }
+                
+               
+            }
+    }
        
         Vector3 GetVector3FromJoint(Joint joint)
         {
